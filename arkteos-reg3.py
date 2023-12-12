@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Version 0.1
+# Version 0.2
 # https://github.com/cyrilpawelko/arkteos_reg3
 
 import socket
@@ -72,7 +72,11 @@ while not ( stream_received[163] and stream_received[227] ):
         if item['byte2']==0 :
             item_value=(data[item['byte1']]*item['weight1'])/item['divider']
         else :
-            item_value=(data[item['byte1']]*item['weight1']+data[item['byte2']]*item['weight2'])/item['divider']
+            bytes_value=data[item['byte1']]*item['weight1']+data[item['byte2']]*item['weight2']
+            if (bytes_value >> 15): # negative value
+                bytes_value = bytes_value - (1 >> 16) # convert to signed int16
+                print("Signed ! value is %.1f" % bytes_value)
+            item_value=(bytes_value/item['divider'])
         print('%s:%.1f, ' % (item['name'], item_value),end='')
         mqtt_client.publish(MQTT_BASE_TOPIC + item['name'], item_value)
     print('')
