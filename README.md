@@ -1,9 +1,10 @@
 # arkteos_reg3
-"Arkteros REG3 heat pump" to MQTT
+"Arkteos REG3 heat pump" to MQTT
 
 Arkteos (formely AJTech) is a French heat pump manufacturer.
 Recent devices uses a connected "REG3" controller which can be remotely and locally managed through its 
 [apps](https://espaceclientarkteos.arkteos.com/mes-applications/). 
+AlpPAC also sells REG3 heat pumps.
 With the help of a lot of sniffing, I was able to decode some important values and wrote a little python script to extract these values and push them to a MQTT server.
 
 ## Protocol overview
