@@ -1,5 +1,6 @@
 #!/usr/bin/python
-# Version 0.2
+# -*- coding: utf-8 -*-
+# Version 0.3
 # https://github.com/cyrilpawelko/arkteos_reg3
 
 import socket
@@ -8,7 +9,7 @@ import datetime
 import sys
 import paho.mqtt.client as mqtt
 
-HOST = '192.168.3.80'
+HOST = "MCHPBOARDxE.pawelko.local" # '192.168.3.80'
 PORT = 9641
 MQTT_HOST = "192.168.3.11"
 MQTT_BASE_TOPIC = "arkteos/reg3/"   # don't forget the trailing slash
@@ -32,7 +33,8 @@ decoder = [
 
     { 'stream' : 227, 'name' : 'ecs_temp_eau_milieu' ,'descr' : 'Température ballon ECS milieu', 'byte1': 108, 'weight1': 1, 'byte2': 109, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'ecs_temp_eau_bas' ,'descr' : 'Température ballon ECS bas', 'byte1': 110, 'weight1': 1, 'byte2': 111, 'weight2': 256, 'divider': 10 },
-
+	{ 'stream' : 163, 'name' : 'fan_speed_evaporator_1' ,'descr' : 'fan_speed_evaporator_1', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 1 },
+	{ 'stream' : 163, 'name' : 'dc_voltage' ,'descr' : 'dc_voltage', 'byte1': 62, 'weight1': 1, 'byte2': 63, 'weight2': 256, 'divider': 1 },
 ]
 
 stream_received_163 = False
@@ -73,12 +75,20 @@ while not ( stream_received[163] and stream_received[227] ):
             item_value=(data[item['byte1']]*item['weight1'])/item['divider']
         else :
             bytes_value=data[item['byte1']]*item['weight1']+data[item['byte2']]*item['weight2']
+            print("---------------------------")
+            print("A - Bytes value = %.1f, %s" % (bytes_value,bin(bytes_value)))
             if (bytes_value >> 15): # negative value
-                bytes_value = bytes_value - (1 >> 16) # convert to signed int16
+                bytes_value = bytes_value - (1 << 16) # convert to signed int16
                 print("Signed ! value is %.1f" % bytes_value)
             item_value=(bytes_value/item['divider'])
         print('%s:%.1f, ' % (item['name'], item_value),end='')
         mqtt_client.publish(MQTT_BASE_TOPIC + item['name'], item_value)
+    if data_lenght == 227 :
+        active_error_reg = data[30] + (data[31] & 0x0f) * 256
+        mqtt_client.publish(MQTT_BASE_TOPIC + 'active_error_reg', active_error_reg)
+    if data_lenght == 163 :
+        active_error_fri = data[12] + (data[13] & 0x0f) * 256
+        mqtt_client.publish(MQTT_BASE_TOPIC + 'active_error_fri', active_error_fri)
     print('')
 
 print('Disconnect')
