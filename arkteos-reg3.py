@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Version 0.3
+# Version 0.4
 # https://github.com/cyrilpawelko/arkteos_reg3
 
 import socket
@@ -14,27 +14,25 @@ PORT = 9641
 MQTT_HOST = "192.168.3.11"
 MQTT_BASE_TOPIC = "arkteos/reg3/"   # don't forget the trailing slash
 
+def signExtend8(x):
+  return (x ^ 0x80) - 0x80
+
+def signExtend16(x):
+  return (x ^ 0x8000) - 0x8000
+
 decoder = [
-    { 'stream' : 227, 'name' : 'primaire_pression' ,'descr' : 'Pression eau primaire', 'byte1': 62, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 10 },
-
-
-
-
-
-
+    { 'stream' : 163, 'name' : 'exterieur_temp' ,'descr' : 'Température extérieure', 'byte1': 24, 'weight1': 1, 'byte2': 25, 'weight2': 256, 'divider': 10 },
+    { 'stream' : 163, 'name' : 'freq_comp_actuelle' ,'descr' : 'Fréquence compresseur actuelle', 'byte1': 52, 'weight1': 1, 'byte2': 53, 'weight2': 256, 'divider': 1 },
+    { 'stream' : 163, 'name' : 'freq_comp_cible' ,'descr' : 'Fréquence compresseur cible', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 1 },
+    { 'stream' : 163, 'name' : 'fan_speed_evaporator_1' ,'descr' : 'Vitesse ventalisateur groupe frigo 1', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 1 },
+    { 'stream' : 163, 'name' : 'dc_voltage' ,'descr' : 'Voltage DC groupe frigo 1', 'byte1': 62, 'weight1': 1, 'byte2': 63, 'weight2': 256, 'divider': 1 },
     { 'stream' : 227, 'name' : 'primaire_temp_eau_aller' ,'descr' : 'Température eau primaire aller', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'primaire_temp_eau_retour' ,'descr' : 'Température eau primaire retour', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 10 },
-
-    { 'stream' : 163, 'name' : 'exterieur_temp' ,'descr' : 'Température extérieure', 'byte1': 24, 'weight1': 1, 'byte2': 25, 'weight2': 256, 'divider': 10 },
+    { 'stream' : 227, 'name' : 'primaire_pression' ,'descr' : 'Pression eau primaire', 'byte1': 62, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 10 },
     { 'stream' : 227, 'name' : 'zone1_temp_interieur' ,'descr' : 'Température intérieur zone 1', 'byte1': 68, 'weight1': 1, 'byte2': 69, 'weight2': 256, 'divider': 10 },
-
-
     { 'stream' : 227, 'name' : 'zone1_consigne' ,'descr' : 'Consigne intérieure zone 1', 'byte1': 70, 'weight1': 1, 'byte2': 71, 'weight2': 256, 'divider': 10 },
-
     { 'stream' : 227, 'name' : 'ecs_temp_eau_milieu' ,'descr' : 'Température ballon ECS milieu', 'byte1': 108, 'weight1': 1, 'byte2': 109, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'ecs_temp_eau_bas' ,'descr' : 'Température ballon ECS bas', 'byte1': 110, 'weight1': 1, 'byte2': 111, 'weight2': 256, 'divider': 10 },
-	{ 'stream' : 163, 'name' : 'fan_speed_evaporator_1' ,'descr' : 'fan_speed_evaporator_1', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 1 },
-	{ 'stream' : 163, 'name' : 'dc_voltage' ,'descr' : 'dc_voltage', 'byte1': 62, 'weight1': 1, 'byte2': 63, 'weight2': 256, 'divider': 1 },
 ]
 
 stream_received_163 = False
@@ -86,6 +84,8 @@ while not ( stream_received[163] and stream_received[227] ):
     if data_lenght == 227 :
         active_error_reg = data[30] + (data[31] & 0x0f) * 256
         mqtt_client.publish(MQTT_BASE_TOPIC + 'active_error_reg', active_error_reg)
+        signal_rf_sonde_1 = signExtend8(data[193])
+        mqtt_client.publish(MQTT_BASE_TOPIC + 'signal_rf_sonde_1', signal_rf_sonde_1)
     if data_lenght == 163 :
         active_error_fri = data[12] + (data[13] & 0x0f) * 256
         mqtt_client.publish(MQTT_BASE_TOPIC + 'active_error_fri', active_error_fri)
