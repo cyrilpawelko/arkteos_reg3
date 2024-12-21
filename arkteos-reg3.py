@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Version 0.4
+# Version 0.5
 # https://github.com/cyrilpawelko/arkteos_reg3
 
 import socket
@@ -35,21 +35,27 @@ decoder = [
     { 'stream' : 227, 'name' : 'ecs_temp_eau_bas' ,'descr' : 'Température ballon ECS bas', 'byte1': 110, 'weight1': 1, 'byte2': 111, 'weight2': 256, 'divider': 10 },
 ]
 
-stream_received_163 = False
-stream_received_227 = False
+statuts_pac = { 0: "Arret", 1: "Attente", 2:  "Chaud", 3: "Froid", 4: "Hors Gel", 5: "Ext Chaud", 6:"Ext Froid", 7:"Chaud Froid", 8:"ECS", 9:"Piscine" }
+
+#stream_received_163 = False
+#stream_received_227 = False
 stream_received = { 163 : False, 227 : False}
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connected = False
 
-mqtt_client = mqtt.Client("arkteos-reg3.py")
+if hasattr(mqtt,"CallbackAPIVersion") :
+    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,"arkteos-reg3.py")
+else :
+    mqtt_client = mqtt.Client("arkteos-reg3.py")
+
 try:
     mqtt_client.connect(MQTT_HOST)
 except:
     print("Error: MQTT connection failed")
     exit(1)
 
-while not connected : # Wait for connection to be available, sometimes one or two minutes
+while not connected : # Wait for connection to be available, sometimes one or two minutes after previous client disconnection
     try :
         client.connect((HOST, PORT))
         connected = True
@@ -81,7 +87,13 @@ while not ( stream_received[163] and stream_received[227] ):
             item_value=(bytes_value/item['divider'])
         print('%s:%.1f, ' % (item['name'], item_value),end='')
         mqtt_client.publish(MQTT_BASE_TOPIC + item['name'], item_value)
-    if data_lenght == 227 :
+        print()
+    if data_lenght == 227 :        
+        statut_pac = data[12] & 0b11111
+        statut_pac_s = statuts_pac[statut_pac]
+        print(statut_pac,statut_pac_s)
+        mqtt_client.publish(MQTT_BASE_TOPIC + 'statut_pac', statut_pac)
+        mqtt_client.publish(MQTT_BASE_TOPIC + 'statut_pac_s', statut_pac_s)
         active_error_reg = data[30] + (data[31] & 0x0f) * 256
         mqtt_client.publish(MQTT_BASE_TOPIC + 'active_error_reg', active_error_reg)
         signal_rf_sonde_1 = signExtend8(data[193])
