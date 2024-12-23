@@ -48,15 +48,15 @@ def connect_to_chaudiere():
 # Fonction pour envoyer un paquet vide au serveur distant toutes les 5 minutes
 def send_keepalive(chaudiere_socket):
     while not stop_event.is_set():
-        time.sleep(30)  # 5 minutes (300 secondes)
+        time.sleep(300)  # 5 minutes (300 secondes)
 #        log(f"{chaudiere_socket}")
-#        if chaudiere_socket and chaudiere_socket.fileno() != -1:
         if True :
             try:
                 log(f"Envoi d'un paquet vide pour keepalive au serveur distant.")
-                chaudiere_socket.sendall(b'0')  # Paquet vide pour maintenir la connexion
+                chaudiere_socket.sendall(b'0')  # Paquet vide pour maintenir la connexion (ne fonctionne pas ?)
             except Exception as e:
                 log(f"Erreur lors de l'envoi du keepalive au serveur distant : {e}")
+                break # essai
         else:
             log(f"La connexion au serveur distant a été fermée. Impossible d'envoyer le keepalive.")
             break
