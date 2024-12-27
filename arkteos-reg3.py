@@ -24,7 +24,7 @@ decoder = [
     { 'stream' : 163, 'name' : 'exterieur_temp' ,'descr' : 'Température extérieure', 'byte1': 24, 'weight1': 1, 'byte2': 25, 'weight2': 256, 'divider': 10 },
     { 'stream' : 163, 'name' : 'freq_comp_actuelle' ,'descr' : 'Fréquence compresseur actuelle', 'byte1': 52, 'weight1': 1, 'byte2': 53, 'weight2': 256, 'divider': 1 },
     { 'stream' : 163, 'name' : 'freq_comp_cible' ,'descr' : 'Fréquence compresseur cible', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 1 },
-    { 'stream' : 163, 'name' : 'fan_speed_evaporator_1' ,'descr' : 'Vitesse ventalisateur groupe frigo 1', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 1 },
+    { 'stream' : 163, 'name' : 'fan_speed_evaporator_1' ,'descr' : 'Vitesse ventilateur groupe frigo 1', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 1 },
     { 'stream' : 163, 'name' : 'dc_voltage' ,'descr' : 'Voltage DC groupe frigo 1', 'byte1': 62, 'weight1': 1, 'byte2': 63, 'weight2': 256, 'divider': 1 },
     { 'stream' : 163, 'name' : 'captage_pression', 'descr' : 'Pression de captage', 'byte1':94, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 10 },
     { 'stream' : 163, 'name' : 'captage_debit' ,'descr' : 'Debit de captage', 'byte1': 102, 'weight1': 1, 'byte2': 103, 'weight2': 256, 'divider': 1 },
