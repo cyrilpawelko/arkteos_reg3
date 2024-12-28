@@ -38,18 +38,21 @@ decoder = [
     { 'stream' : 163, 'name' : 'frigo_detenteur_position' ,'descr' : 'GEO : Position détendeur évaporateur', 'byte1': 116, 'weight1': 1, 'byte2': 117, 'weight2': 256, 'divider': 1 },
     { 'stream' : 163, 'name' : 'puissance_inst_captee' ,'descr' : 'GEO : PW captée instantanée', 'byte1': 124, 'weight1': 1, 'byte2': 125, 'weight2': 256, 'divider': 1 },
     { 'stream' : 163, 'name' : 'captage_%pompe' ,'descr' : 'GEO : Consigne circulateur captage', 'byte1': 129, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 1 },
-    
     { 'stream' : 227, 'name' : 'puissance_inst_produite' ,'descr' : 'Puissance instantanée produite', 'byte1': 16, 'weight1': 1, 'byte2': 17, 'weight2': 256, 'divider': 0.1 },
     { 'stream' : 227, 'name' : 'puissance_inst_consommee' ,'descr' : 'Puissance instantanée consommée', 'byte1': 18, 'weight1': 1, 'byte2': 19, 'weight2': 256, 'divider': 0.1 },
     { 'stream' : 227, 'name' : 'temps_mise_sous_tension' ,'descr' : 'Temps mise sous tension (h)', 'byte1': 20, 'weight1': 1, 'byte2': 21, 'weight2': 256, 'divider': 1 },
+    { 'stream' : 227, 'name' : 'primaire_temp_eau_aller_consigne' ,'descr' : 'Consigne température départ eau primaire', 'byte1': 52, 'weight1': 1, 'byte2': 53, 'weight2': 256, 'divider': 10 },   
     { 'stream' : 227, 'name' : 'primaire_temp_eau_aller' ,'descr' : 'Température eau primaire aller', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'primaire_temp_eau_retour' ,'descr' : 'Température eau primaire retour', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 10 },
+    { 'stream' : 227, 'name' : 'primaire_debit_eau' ,'descr' : 'Débit primaire', 'byte1': 60, 'weight1': 1, 'byte2': 61, 'weight2': 256, 'divider': 1 },
     { 'stream' : 227, 'name' : 'primaire_pression' ,'descr' : 'Pression eau primaire', 'byte1': 62, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 10 },
+    { 'stream' : 227, 'name' : 'primaire_%pompe' ,'descr' : 'Consigne circulateur primaire', 'byte1': 64, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 1 },
     { 'stream' : 227, 'name' : 'zone1_temp_interieur' ,'descr' : 'Température intérieur zone 1', 'byte1': 68, 'weight1': 1, 'byte2': 69, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'zone1_consigne' ,'descr' : 'Consigne intérieure zone 1', 'byte1': 70, 'weight1': 1, 'byte2': 71, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'ecs_temp_eau_milieu' ,'descr' : 'Température ballon ECS milieu', 'byte1': 108, 'weight1': 1, 'byte2': 109, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'ecs_temp_eau_bas' ,'descr' : 'Température ballon ECS bas', 'byte1': 110, 'weight1': 1, 'byte2': 111, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'ecs_consigne' ,'descr' : 'Température consigne ECS', 'byte1': 122, 'weight1': 1, 'byte2': 123, 'weight2': 256, 'divider': 10 },
+    { 'stream' : 227, 'name' : 'nb cycle compresseur 1' ,'descr' : 'Nombre cycle compresseur', 'byte1': 148, 'weight1': 1, 'byte2': 149, 'weight2': 256, 'divider': 1 },
 ]
 
 statuts_pac = { 0: "Arret", 1: "Attente", 2:  "Chaud", 3: "Froid", 4: "Hors Gel", 5: "Ext Chaud", 6:"Ext Froid", 7:"Chaud Froid", 8:"ECS", 9:"Piscine" }
