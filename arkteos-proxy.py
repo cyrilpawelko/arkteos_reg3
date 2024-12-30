@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # Démon proxy pour servir plusieurs clients Arkteos simultanément
+# Travail préliminaire : fonctionne correctement, mais fuite mémoire (pb de gestion des threads)
 
 import socket
 import threading
@@ -47,6 +48,7 @@ def connect_to_chaudiere():
 
 # Fonction pour envoyer un paquet vide au serveur distant toutes les 5 minutes
 def send_keepalive(chaudiere_socket):
+    log("Demarrage thread keepalive")
     while not stop_event.is_set():
         time.sleep(300)  # 5 minutes (300 secondes)
 #        log(f"{chaudiere_socket}")
@@ -56,7 +58,6 @@ def send_keepalive(chaudiere_socket):
                 chaudiere_socket.sendall(b'0')  # Paquet vide pour maintenir la connexion (ne fonctionne pas ?)
             except Exception as e:
                 log(f"Erreur lors de l'envoi du keepalive au serveur distant : {e}")
-                break # essai
         else:
             log(f"La connexion au serveur distant a été fermée. Impossible d'envoyer le keepalive.")
             break
@@ -66,10 +67,11 @@ def handle_client(client_socket, client_addr, chaudiere_socket):
     # Ajouter le client à la liste des clients connectés
     with threading.Lock():
         clients.append(client_socket)
-
+    log("Démarrage thread client")
     try:
         # Démarrer un thread pour surveiller les données envoyées par le serveur distant
         def forward_from_chaudiere():
+            log("Demarrage thread forward_from_chaudiere")
             try:
                 while not stop_event.is_set():
                     response = chaudiere_socket.recv(1024)
@@ -88,7 +90,7 @@ def handle_client(client_socket, client_addr, chaudiere_socket):
             except Exception as e:
                 log(f"Erreur, Connexion au serveur distant perdue : {e}")
                 chaudiere_socket.close()
-
+            log("Arret  thread forward_from_chaudiere")
         # Lancer le thread pour surveiller le serveur distant
         threading.Thread(target=forward_from_chaudiere, daemon=True).start()
 
@@ -111,6 +113,7 @@ def handle_client(client_socket, client_addr, chaudiere_socket):
         with threading.Lock():
             clients.remove(client_socket)  # Supprimer le client de la liste des clients
         client_socket.close()
+        log("Arret thread client")
 
 # Lancement du serveur TCP local
 def start_local_server():
@@ -130,7 +133,7 @@ def start_local_server():
             if chaudiere_socket is None or chaudiere_socket.fileno() == -1:
                 chaudiere_socket = connect_to_chaudiere()
     
-                # Démarrage du keepalive, sinon déconnexion après 10 minutes d'inactivité des clients
+                # Démarrage du keepalive, pour éviter la déconnexion après 10 minutes d'inactivité des clients
                 keepalive_thread = threading.Thread(target=send_keepalive, args=(chaudiere_socket,))
                 keepalive_thread.daemon = True
                 keepalive_thread.start()
