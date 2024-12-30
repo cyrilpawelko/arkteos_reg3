@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Version 0.6
+# Version 0.7
 # https://github.com/cyrilpawelko/arkteos_reg3
 
 import socket
@@ -9,7 +9,7 @@ import datetime
 import sys
 import paho.mqtt.client as mqtt
 
-HOST = "MCHPBOARDxE.pawelko.local" # '192.168.3.80'
+HOST = "192.168.3.11" # "MCHPBOARDxE.pawelko.local" # '192.168.3.80'
 PORT = 9641
 MQTT_HOST = "192.168.3.11"
 MQTT_BASE_TOPIC = "arkteos/reg3/"   # don't forget the trailing slash
@@ -29,6 +29,7 @@ decoder = [
     { 'stream' : 227, 'name' : 'puissance_inst_produite' ,'descr' : 'Puissance instanée produite', 'byte1': 16, 'weight1': 1, 'byte2': 17, 'weight2': 256, 'divider': 0.1 },
     { 'stream' : 227, 'name' : 'puissance_inst_consommee' ,'descr' : 'Puissance instanée consommée', 'byte1': 18, 'weight1': 1, 'byte2': 19, 'weight2': 256, 'divider': 0.1 },
     { 'stream' : 227, 'name' : 'temps_mise_sous_tension' ,'descr' : 'Temps mise sous tension (h)', 'byte1': 20, 'weight1': 1, 'byte2': 21, 'weight2': 256, 'divider': 1 },
+    { 'stream' : 227, 'name' : 'modele_pac' ,'descr' : 'Modèle PAC', 'byte1': 46, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 1 },
     { 'stream' : 227, 'name' : 'primaire_temp_eau_aller' ,'descr' : 'Température eau primaire aller', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'primaire_temp_eau_retour' ,'descr' : 'Température eau primaire retour', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 10 },
     { 'stream' : 227, 'name' : 'primaire_pression' ,'descr' : 'Pression eau primaire', 'byte1': 62, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 10 },
@@ -40,9 +41,8 @@ decoder = [
 ]
 
 statuts_pac = { 0: "Arret", 1: "Attente", 2:  "Chaud", 3: "Froid", 4: "Hors Gel", 5: "Ext Chaud", 6:"Ext Froid", 7:"Chaud Froid", 8:"ECS", 9:"Piscine" }
+modeles_pac = { 0x10 : "AJPAC_III", 0x11 : "BAGUIO_ZURAN_IV", 0x12: "TIMAX_III", 0x13 : "GEOTWIN_IV", 0x14 : "CAIROX", 0x15 : "PHOENIX", 0x16 : "ARKTEA", 0x17 : "GEOINVERTER", 0x18 : "LAST_MODEL"}
 
-#stream_received_163 = False
-#stream_received_227 = False
 stream_received = { 163 : False, 227 : False}
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -102,6 +102,8 @@ while not ( stream_received[163] and stream_received[227] ):
         mqtt_client.publish(MQTT_BASE_TOPIC + 'active_error_reg', active_error_reg)
         signal_rf_sonde_1 = signExtend8(data[193])
         mqtt_client.publish(MQTT_BASE_TOPIC + 'signal_rf_sonde_1', signal_rf_sonde_1)
+        modele_pac_s = modeles_pac[data[46]]
+        mqtt_client.publish(MQTT_BASE_TOPIC + 'modele_pac_s', modele_pac_s)
     if data_lenght == 163 :
         active_error_fri = data[12] + (data[13] & 0x0f) * 256
         mqtt_client.publish(MQTT_BASE_TOPIC + 'active_error_fri', active_error_fri)
