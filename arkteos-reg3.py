@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Version 0.7
+# Version 0.7.1
 # https://github.com/cyrilpawelko/arkteos_reg3
 
 import socket
@@ -21,23 +21,29 @@ def signExtend16(x):
   return (x ^ 0x8000) - 0x8000
 
 decoder = [
-    { 'stream' : 163, 'name' : 'exterieur_temp' ,'descr' : 'Température extérieure', 'byte1': 24, 'weight1': 1, 'byte2': 25, 'weight2': 256, 'divider': 10 },
-    { 'stream' : 163, 'name' : 'freq_comp_actuelle' ,'descr' : 'Fréquence compresseur actuelle', 'byte1': 52, 'weight1': 1, 'byte2': 53, 'weight2': 256, 'divider': 1 },
-    { 'stream' : 163, 'name' : 'freq_comp_cible' ,'descr' : 'Fréquence compresseur cible', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 1 },
-    { 'stream' : 163, 'name' : 'fan_speed_evaporator_1' ,'descr' : 'Vitesse ventalisateur groupe frigo 1', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 1 },
-    { 'stream' : 163, 'name' : 'dc_voltage' ,'descr' : 'Voltage DC groupe frigo 1', 'byte1': 62, 'weight1': 1, 'byte2': 63, 'weight2': 256, 'divider': 1 },
-    { 'stream' : 227, 'name' : 'puissance_inst_produite' ,'descr' : 'Puissance instanée produite', 'byte1': 16, 'weight1': 1, 'byte2': 17, 'weight2': 256, 'divider': 0.1 },
-    { 'stream' : 227, 'name' : 'puissance_inst_consommee' ,'descr' : 'Puissance instanée consommée', 'byte1': 18, 'weight1': 1, 'byte2': 19, 'weight2': 256, 'divider': 0.1 },
-    { 'stream' : 227, 'name' : 'temps_mise_sous_tension' ,'descr' : 'Temps mise sous tension (h)', 'byte1': 20, 'weight1': 1, 'byte2': 21, 'weight2': 256, 'divider': 1 },
-    { 'stream' : 227, 'name' : 'modele_pac' ,'descr' : 'Modèle PAC', 'byte1': 46, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 1 },
-    { 'stream' : 227, 'name' : 'primaire_temp_eau_aller' ,'descr' : 'Température eau primaire aller', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 10 },
-    { 'stream' : 227, 'name' : 'primaire_temp_eau_retour' ,'descr' : 'Température eau primaire retour', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 10 },
-    { 'stream' : 227, 'name' : 'primaire_pression' ,'descr' : 'Pression eau primaire', 'byte1': 62, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 10 },
-    { 'stream' : 227, 'name' : 'zone1_temp_interieur' ,'descr' : 'Température intérieur zone 1', 'byte1': 68, 'weight1': 1, 'byte2': 69, 'weight2': 256, 'divider': 10 },
-    { 'stream' : 227, 'name' : 'zone1_consigne' ,'descr' : 'Consigne intérieure zone 1', 'byte1': 70, 'weight1': 1, 'byte2': 71, 'weight2': 256, 'divider': 10 },
-    { 'stream' : 227, 'name' : 'ecs_temp_eau_milieu' ,'descr' : 'Température ballon ECS milieu', 'byte1': 108, 'weight1': 1, 'byte2': 109, 'weight2': 256, 'divider': 10 },
-    { 'stream' : 227, 'name' : 'ecs_temp_eau_bas' ,'descr' : 'Température ballon ECS bas', 'byte1': 110, 'weight1': 1, 'byte2': 111, 'weight2': 256, 'divider': 10 },
-    { 'stream' : 227, 'name' : 'ecs_consigne' ,'descr' : 'Température consigne ECS', 'byte1': 122, 'weight1': 1, 'byte2': 123, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 163, 'name' : 'exterieur_temp' ,'descr' : 'Température extérieure', 'byte1': 24, 'weight1': 1, 'byte2': 25, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 163, 'name' : 'nb_cycles_compresseur' ,'descr' : 'Nombre de cycles compresseur (arrondi à 100)', 'byte1': 42, 'weight1': 1, 'byte2': 43, 'weight2': 256, 'divider': 0.01 },
+{ 'stream' : 163, 'name' : 'freq_comp_actuelle' ,'descr' : 'Fréquence compresseur actuelle', 'byte1': 52, 'weight1': 1, 'byte2': 53, 'weight2': 256, 'divider': 1 },
+{ 'stream' : 163, 'name' : 'freq_comp_cible' ,'descr' : 'Fréquence compresseur cible', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 1 },
+{ 'stream' : 163, 'name' : 'fan_speed_evaporator_1' ,'descr' : 'Vitesse ventilateur groupe frigo 1', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 1 },
+{ 'stream' : 163, 'name' : 'dc_voltage' ,'descr' : 'Voltage DC groupe frigo 1', 'byte1': 62, 'weight1': 1, 'byte2': 63, 'weight2': 256, 'divider': 1 },
+
+{ 'stream' : 227, 'name' : 'puissance_inst_produite' ,'descr' : 'Puissance instantanée produite', 'byte1': 16, 'weight1': 1, 'byte2': 17, 'weight2': 256, 'divider': 0.1 },
+{ 'stream' : 227, 'name' : 'puissance_inst_consommee' ,'descr' : 'Puissance instantanée consommée', 'byte1': 18, 'weight1': 1, 'byte2': 19, 'weight2': 256, 'divider': 0.1 },
+
+{ 'stream' : 227, 'name' : 'modele_pac' ,'descr' : 'Modèle PAC', 'byte1': 46, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 1 },
+{ 'stream' : 227, 'name' : 'primaire_debit_eau' ,'descr' : 'Débit eau primaire', 'byte1': 60, 'weight1': 1, 'byte2': 61, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'primaire_temp_eau_consigne' ,'descr' : 'Consigne température eau primaire ', 'byte1': 52, 'weight1': 1, 'byte2': 53, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'primaire_temp_eau_aller' ,'descr' : 'Température eau primaire aller', 'byte1': 54, 'weight1': 1, 'byte2': 55, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'primaire_temp_eau_retour' ,'descr' : 'Température eau primaire retour', 'byte1': 56, 'weight1': 1, 'byte2': 57, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'primaire_pression' ,'descr' : 'Pression eau primaire', 'byte1': 62, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'primaire_circulateur_consigne' ,'descr' : 'Consigne % circulateur primaire', 'byte1': 64, 'weight1': 1, 'byte2': 0, 'weight2': 0, 'divider': 1 },
+{ 'stream' : 227, 'name' : 'zone1_temp_interieur' ,'descr' : 'Température intérieur zone 1', 'byte1': 68, 'weight1': 1, 'byte2': 69, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'zone1_consigne' ,'descr' : 'Consigne intérieure zone 1', 'byte1': 70, 'weight1': 1, 'byte2': 71, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'ecs_temp_eau_milieu' ,'descr' : 'Température ballon ECS milieu', 'byte1': 108, 'weight1': 1, 'byte2': 109, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'ecs_temp_eau_bas' ,'descr' : 'Température ballon ECS bas', 'byte1': 110, 'weight1': 1, 'byte2': 111, 'weight2': 256, 'divider': 10 },
+{ 'stream' : 227, 'name' : 'ecs_consigne' ,'descr' : 'Température consigne ECS', 'byte1': 122, 'weight1': 1, 'byte2': 123, 'weight2': 256, 'divider': 10 },
+
 ]
 
 statuts_pac = { 0: "Arret", 1: "Attente", 2:  "Chaud", 3: "Froid", 4: "Hors Gel", 5: "Ext Chaud", 6:"Ext Froid", 7:"Chaud Froid", 8:"ECS", 9:"Piscine" }
